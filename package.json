@@ -1,0 +1,24 @@
+{
+  "name": "@turinggroup/serverless-express-custom-domain-middleware",
+  "version": "1.0.0",
+  "description": "matches request urls when basepath in api-gateway and custom domain mismatch",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/turinggroup/serverless-express-custom-domain-middleware.git"
+  },
+  "keywords": [
+    "aws",
+    "serverless",
+    "express"
+  ],
+  "author": "Andrea Cadeddu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/turinggroup/serverless-express-custom-domain-middleware/issues"
+  },
+  "homepage": "https://github.com/turinggroup/serverless-express-custom-domain-middleware#readme"
+}
