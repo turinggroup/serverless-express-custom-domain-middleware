@@ -18,6 +18,11 @@ module.exports.customDomainReroute = (req,res,next) => {
 
         let interpolated_resource = Object.keys(params)
             .reduce(replace_params, event.resource)
+
+        //covers trailing slash cornercase, since trailing slashes are not returned in event.resource .
+        if (event.path.endsWith('/') && ! interpolated_resource.endsWith('/')){
+            interpolated_resource = `${interpolated_resource}/`;
+        }    
         
         if ((!! event.path && !! interpolated_resource) && event.path != interpolated_resource){
             req.url = req.originalUrl = interpolated_resource;
