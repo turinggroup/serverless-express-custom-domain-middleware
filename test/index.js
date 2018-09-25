@@ -1,17 +1,14 @@
 const chai = require('chai');
-const customDomainReroute = require('../index').setup();
+const spies = require('chai-spies');
+chai.use(spies);
+const reqs = require('./helper');
+const rerouter = require('../index');
+const customDomainReroute = rerouter.setup();
 
 
 describe('When not coming from API Gateway', function() {
-  const req = {
-    headers: {
-      Authorization: 'some_key_here',
-    },
-    url: '/untouched_url',
-    originalUrl: '/untouched_originalUrl',
-  };
-
   it('Does not alter req.url or req.originalUrl', function(done) {
+    const req = reqs.noGateway();
     customDomainReroute(req, {}, function() {
       chai.expect(req.url).to.equal('/untouched_url');
       chai.expect(req.originalUrl).to.equal('/untouched_originalUrl');
@@ -22,17 +19,7 @@ describe('When not coming from API Gateway', function() {
 
 
 describe('When no path parameters', function() {
-  const req = {
-    headers: {
-      'x-apigateway-event': encodeURIComponent(JSON.stringify({
-        path: '/custom_map/some_path',
-        pathParameters: null,
-        resource: '/some_path',
-      })),
-    },
-    url: '/custom_map/some_path',
-    originalUrl: '/custom_map/some_path',
-  };
+  const req = reqs.noParam();
 
   it('remove custom path prefix', function(done) {
     customDomainReroute(req, {}, function() {
@@ -45,17 +32,7 @@ describe('When no path parameters', function() {
 
 
 describe('When there are path parameters', function() {
-  const req = {
-    headers: {
-      'x-apigateway-event': encodeURIComponent(JSON.stringify({
-        path: '/custom_map/id_01',
-        pathParameters: { resource_id: 'id_01'},
-        resource: '/{resource_id}',
-      })),
-    },
-    url: '/custom_map/id_01',
-    originalUrl: '/custom_map/id_01',
-  };
+  const req = reqs.withParam();
 
   it('remove custom path prefix', function(done) {
     customDomainReroute(req, {}, function() {
@@ -63,5 +40,22 @@ describe('When there are path parameters', function() {
       chai.expect(req.originalUrl).to.equal('/id_01');
       done();
     });
+  });
+});
+
+describe('Custom notifier', function() {
+  const noop = () => null;
+  it('does not thow error if onRouted is not a function', function() {
+    const middleware = rerouter.setup({ onRouted: 'notafunction' });
+    chai.expect(() => middleware(reqs.withParam(), {}, noop)).not.to.throw();
+  });
+
+  it('calls onRouted function', function() {
+    const spy = chai.spy(() => null);
+    const middleware = rerouter.setup({
+      onRouted: spy,
+    });
+    middleware(reqs.withParam(), {}, noop);
+    chai.expect(spy).to.have.been.called.once;
   });
 });
