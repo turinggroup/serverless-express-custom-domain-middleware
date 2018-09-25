@@ -33,7 +33,6 @@ describe('When no path parameters', function() {
 
 describe('When there are path parameters', function() {
   const req = reqs.withParam();
-
   it('remove custom path prefix', function(done) {
     customDomainReroute(req, {}, function() {
       chai.expect(req.url).to.equal('/id_01');
@@ -43,19 +42,38 @@ describe('When there are path parameters', function() {
   });
 });
 
+
 describe('Custom notifier', function() {
   const noop = () => null;
-  it('does not thow error if onRouted is not a function', function() {
-    const middleware = rerouter.setup({ onRouted: 'notafunction' });
-    chai.expect(() => middleware(reqs.withParam(), {}, noop)).not.to.throw();
+  describe('Where there is invalid input', function() {
+    it('does not thow an error if onRouted is not a function', function() {
+      const middleware = rerouter.setup({ onRouted: 'notafunction' });
+      chai.expect(() => middleware(reqs.withParam(), {}, noop)).not.to.throw();
+    });
+
+    it('does not throw an error if nothing is passed in', function() {
+      const middleware = rerouter.setup({});
+      chai.expect(() => middleware(reqs.withParam(), {}, noop)).not.to.throw();
+    });
   });
 
-  it('calls onRouted function', function() {
-    const spy = chai.spy(() => null);
-    const middleware = rerouter.setup({
-      onRouted: spy,
+  describe('With a function passed in', function() {
+    let middleware;
+    let config;
+    beforeEach(() => {
+      config = { onRouted: () => null };
+      middleware = rerouter.setup(config);
+      chai.spy.on(config, 'onRouted');
     });
-    middleware(reqs.withParam(), {}, noop);
-    chai.expect(spy).to.have.been.called.once;
+
+    it('calls onRouted with original and new paths', function() {
+      middleware(reqs.withParam(), {}, noop);
+      chai.expect(config.onRouted).to.have.been.called.with.exactly('/custom_map/id_01', '/id_01');
+    });
+
+    it('calls onRouted function only once', function() {
+      middleware(reqs.withParam(), {}, noop);
+      chai.expect(config.onRouted).to.have.been.called.once;
+    });
   });
 });
