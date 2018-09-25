@@ -1,5 +1,5 @@
 const chai = require('chai');
-const customDomainReroute = require('../index').customDomainReroute;
+const customDomainReroute = require('../index').setup();
 
 
 describe('When not coming from API Gateway', function() {
