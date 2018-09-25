@@ -1,5 +1,5 @@
 const standardRerouter = setup({
-  onRouted: (orig, interpolated) => console.log(`rerouted ${orig} -> ${interpolated}`);
+  onRouted: (orig, interpolated) => console.log(`rerouted ${orig} -> ${interpolated}`),
 });
 
 module.exports = {
