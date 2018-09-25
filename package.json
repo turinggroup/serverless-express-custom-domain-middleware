@@ -1,6 +1,6 @@
 {
   "name": "@turinggroup/serverless-express-custom-domain-middleware",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "matches request urls when basepath in api-gateway and custom domain mismatch",
   "main": "index.js",
   "types": "index.d.ts",
