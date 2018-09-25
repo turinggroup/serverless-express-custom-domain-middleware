@@ -1,7 +1,12 @@
+const standardRerouter = setup({
+  onRouted: (orig, interpolated) => console.log(`rerouted ${orig} -> ${interpolated}`);
+});
+
 module.exports = {
-  customDomainReroute: setup({ logger: console.log });
+  customDomainReroute: standardRerouter,
   setup,
 };
+
 
 function setup(opts = {}) {
   return function routerMiddleware(req, res, next) {
@@ -27,8 +32,8 @@ function setup(opts = {}) {
 
       if ((!!event.path && !!interpolated_resource) && event.path != interpolated_resource) {
         req.url = req.originalUrl = interpolated_resource;
-        if (opts.logger && typeof opts.logger === 'function') {
-          opts.logger(`rerouted ${event.path} -> ${interpolated_resource}`);
+        if (opts.onRouted && typeof opts.onRouted === 'function') {
+          opts.onRouted(event.path, interpolated_resource);
         }
       }
     }
